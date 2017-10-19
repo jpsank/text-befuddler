@@ -54,7 +54,7 @@ def save_text(text,br=False):
         f.write(text+"\n")
 
 
-SAVETEXT = True
+SAVETEXT = False
 
 
 text = input("text to befuddle: ")
