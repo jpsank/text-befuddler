@@ -1,6 +1,7 @@
 import requests
 import json
 import random
+import html
 
 
 languages = [
@@ -19,7 +20,7 @@ def translate(text, src="en", dest="zh-TW"):
     page = session.post(url,data=data,headers=headers)
     j = json.loads(page.text)
     if j["translation_id"] != 0:
-        return j["translated_text"].encode('utf-8')
+        return html.unescape(j["translated_text"]).encode('utf-8')
 
 
 def scatterify(text,p=False):
@@ -68,5 +69,6 @@ while True:
     if SAVETEXT:
         save_text(text)
     print(text.decode())
+
 
 
