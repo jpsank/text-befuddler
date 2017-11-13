@@ -2,6 +2,7 @@ import requests
 import json
 import random
 import html
+import time
 
 
 languages = [
@@ -55,20 +56,29 @@ def save_text(text,br=False):
         f.write(text+"\n")
 
 
+def go_again():
+    text = input("text to befuddle: ")
+
+    if SAVETEXT:
+        save_text(text, True)
+    print(text)
+
+    while True:
+        text = befuddle(text)
+        if SAVETEXT:
+            save_text(text)
+        print(text.decode())
+        again = input("Would you like to befuddle more text? yes/no: ")
+        if again == "yes":
+            go_again()
+        else:
+            quit()
+
+
 SAVETEXT = False
 
+go_again()
 
-text = input("text to befuddle: ")
-
-if SAVETEXT:
-    save_text(text,True)
-print(text)
-
-while True:
-    text = befuddle(text)
-    if SAVETEXT:
-        save_text(text)
-    print(text.decode())
 
 
 
