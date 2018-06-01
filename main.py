@@ -3,6 +3,7 @@ import json
 import random
 import html
 import time
+import argparse
 
 
 languages = [
@@ -13,7 +14,7 @@ languages = [
 def translate(text, src="en", dest="zh-TW"):
     session = requests.session()
     url = "https://www.translate.com/translator/ajax_translate"
-    headers = {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36 OPR/48.0.2685.39"}
+    headers = {"user-agent": "Mozilla/5.0"}
     data = {"text_to_translate": text,
               "source_lang": src,
               "translated_lang": dest,
@@ -24,24 +25,24 @@ def translate(text, src="en", dest="zh-TW"):
         return html.unescape(j["translated_text"]).encode('utf-8')
 
 
-def scatterify(text,p=False):
+def scatterify(text,verbose=False):
     lang1 = random.choice(languages)
     lang2 = random.choice(languages)
 
     text = translate(text, "en", lang1)
-    if p: print('en - %s' % lang1, text)
+    if verbose: print('en - %s' % lang1, text)
     if text is not None:
         text = translate(text, lang1, lang2)
-        if p: print('%s - %s' % (lang1, lang2), text)
+        if verbose: print('%s - %s' % (lang1, lang2), text)
         if text is not None:
             text = translate(text, lang2, "en")
     return text
 
 
-def befuddle(text,p=False):
+def befuddle(text,verbose=False):
     if isinstance(text,str):
         text = text.encode()
-    new = scatterify(text,p)
+    new = scatterify(text,verbose)
     if new is None:
         new = text
     return new
@@ -56,29 +57,23 @@ def save_text(text,br=False):
         f.write(text+"\n")
 
 
-def go_again():
-    text = input("text to befuddle: ")
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("text", nargs='+', help="text to befuddle")
+    parser.add_argument("-n", dest="n", default=1, type=int, help="number of befuddlements to perform")
+    parser.add_argument("--no-save", dest="nosave", action="store_true", help="Do not save output")
 
-    if SAVETEXT:
-        save_text(text, True)
+    args = parser.parse_args()
+
+    text = ' '.join(args.text)
     print(text)
+    if not args.nosave:
+        save_text(text, True)
 
-    while True:
+    for i in range(args.n):
         text = befuddle(text)
-        if SAVETEXT:
-            save_text(text)
         print(text.decode())
-        again = input("Would you like to befuddle more text? yes/no: ")
-        if again == "yes":
-            go_again()
-        else:
-            quit()
-
-
-SAVETEXT = False
-
-go_again()
-
-
+        if not args.nosave:
+            save_text(text)
 
 
